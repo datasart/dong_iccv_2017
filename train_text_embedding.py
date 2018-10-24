@@ -1,5 +1,5 @@
 import argparse
-import fasttext
+import fastText
 
 import torch
 import torch.nn as nn
@@ -63,7 +63,7 @@ def pairwise_ranking_loss(margin, x, v):
 
 if __name__ == '__main__':
     print('Loading a pretrained fastText model...')
-    word_embedding = fasttext.load_model(args.fasttext_model)
+    word_embedding = fastText.load_model(args.fasttext_model)
 
     print('Loading a dataset...')
     train_data = ReedICML2016(args.img_root,

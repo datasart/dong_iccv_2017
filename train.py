@@ -1,5 +1,5 @@
 import argparse
-import fasttext
+import fastText
 import numpy as np
 
 import torch
@@ -63,6 +63,7 @@ def preprocess(img, desc, len_desc, txt_encoder):
     len_desc = len_desc.numpy()
     sorted_indices = np.argsort(len_desc)[::-1]
     original_indices = np.argsort(sorted_indices)
+    sorted_indices = torch.from_numpy(sorted_indices.copy()).cuda()
     packed_desc = nn.utils.rnn.pack_padded_sequence(
         desc[sorted_indices, ...].transpose(0, 1),
         len_desc[sorted_indices]
@@ -85,7 +86,7 @@ def preprocess(img, desc, len_desc, txt_encoder):
 
 if __name__ == '__main__':
     print('Loading a pretrained fastText model...')
-    word_embedding = fasttext.load_model(args.fasttext_model)
+    word_embedding = fastText.load_model(args.fasttext_model)
 
     print('Loading a dataset...')
     train_data = ReedICML2016(args.img_root,
@@ -146,7 +147,7 @@ if __name__ == '__main__':
             img, txt_feat, txt_feat_mismatch, txt_feat_relevant = \
                 preprocess(img, desc, len_desc, txt_encoder)
             img_norm = img * 2 - 1
-            img_G = Variable(vgg_normalize(img.data)) if args.use_vgg else img_norm
+            img_G = Variable(torch.stack([vgg_normalize(i) for i in img.data])) if args.use_vgg else img_norm
 
             ONES = Variable(torch.ones(img.size(0)))
             ZEROS = Variable(torch.zeros(img.size(0)))
